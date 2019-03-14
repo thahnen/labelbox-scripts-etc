@@ -43,5 +43,4 @@ for DIR in $PLAIN_PATH/*/; do
 done
 
 ENDING=$(date +%s)
-DIFF=$(echo "$ENDING-$START" | bc)
-echo "All videos done! Time: $DIFF sec"
+echo "All videos done! Time: $(echo "$ENDING-$BEGIN" | bc) sec"

@@ -73,5 +73,4 @@ for DIR in $PLAIN_PATH/*/; do
 done
 
 ENDING=$(date +%s)
-DIFF=$(echo "$ENDING - $START" | bc)
-echo "Done Directory ... Time: $DIFF Sec"
+echo "Done Directory ... Time: $(echo "$ENDING-$BEGIN" | bc) Sec"
