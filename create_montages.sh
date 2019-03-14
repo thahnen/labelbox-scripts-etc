@@ -1,80 +1,77 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-## Um auf /data/ Veraenderungen vorzunehmen, muss man Root sein!
+## For working with /data/ user must be root!
 if [[ "$( id -u )" != "0" ]]; then
-	echo "Skript muss als Root ausgeführt werden!" 1>&2
+	echo "Be root to use me!" 1>&2
 	exit 1
 fi
 
 
-## Alle Ordner, mit denen gearbeitet wird!
+## All worked on folders!
 PLAIN_PATH=/data/DVS/DVS_HGH/plain
 CLUSTERED=$PLAIN_PATH/../cluster
 ACCUMULATED=$PLAIN_PATH/../accumulated
 LABELBOX=$PLAIN_PATH/../labelbox
     
     
-## Hier testen, ob die Verzeichnisse existieren!
+## Test if directories exists!
 if [[ ! -d $PLAIN_PATH ]] || [[ ! -d $CLUSTERED ]] || [[ ! -d $ACCUMULATED ]]; then
-    echo "Plain-Ordner oder Clustered-Ordner oder Accumulated-Ordner existiert nicht, Montage nicht moeglich!"
+    echo "Plain/ Clustered or Accumulated folder does not exist, cannot create Montages!"
 fi
 
 if [[ ! -d $LABELBOX ]]; then
-    echo "Labelbox-Ordner existiert nicht, wird erstellt!"
+    echo "Labelbox folder does not exist yet, gets ceated!"
 
     mkdir $PLAIN_PATH/labelbox
     if [[ $? -ne 0 ]]; then
-        echo "Labelbox-Ordner konnte nicht erstellt werden!"
-        echo "Moeglicherweise keine Rechte vorhanden?"
+        echo "Creation of Labelbox folder not possible!"
+        echo "Maybe some rights missing?"
         exit 1
     fi
 fi
 
 
-## Hier testen, ob Plain-Ordner auch Daten beinhaltet!
-## Kommt noch ...
+BEGIN=$(date +%s)
 
-
-## Alle Datensaetze durchgehen
+## For all datasets do
 for DIR in $PLAIN_PATH/*/; do
     echo "Running Directory: $DIR"
-    BEGIN=$(date +%s.%N)
     
-    DIR=${DIR%*/}       ## Entfernt hinteren "/"
-    DIR=${DIR##*/}      ## Entfernt alles vor letzem "/"
+    DIR=${DIR%*/}       ## Strips following "/"
+    DIR=${DIR##*/}      ## Strips everything before last "/"
 
-    ## Existiert das DIR auch in jedem der Ordner?
+    ## Does DIR exist in every folder?
     if [[ ! -d $CLUSTERED/$DIR ]] || [[ ! -d $ACCUMULATED/$DIR ]]; then
-        echo "Es gibt keine geclusterten oder akkumulierten Dateien fuer den Ordner $DIR, Montage nicht moeglich"
+        echo "There is no Clustered or Accumulated folder for $DIR, cannot create Montages"
         exit 1
     fi
 
     if [[ ! -d $LABELBOX/$DIR ]]; then
-        echo "Labelbox-$DIR-Ordner existiert nicht, wird erstellt!"
+        echo "Labelbox $DIR folder does not exist yet, gets created!"
 
         mkdir $LABELBOX/$DIR
         if [[ $? -ne 0 ]]; then
-            echo "Labelbox-$DIR-Ordner konnte nicht erstellt werden!"
-            echo "Moeglicherweise keine Rechte vorhanden?"
+            echo "Creation of Labelbox $DIR folder not possible!"
+            echo "Maybe some rights missing?"
             exit 1
         fi
     fi
 
-    ## Die erste und die letzte Bild-Id bekommen
+    ## Gets first and last id of images
     cd $PLAIN_PATH/$DIR/
     START=$(find . -name '*.png' | sort | head -1 | cut -d'/' -f2 | cut -d'_' -f1)
     END=$(find . -name '*.png' | sort | tail -1 | cut -d'/' -f2 | cut -d'_' -f1)
 
-    ## Fuer jedes Bild Montage durchfuehren
+    ## For all images do montage
     for i in $(eval echo {$START..$END}); do
         montage $CLUSTERED/$DIR/${i}_clustered.png $ACCUMULATED/$DIR/${i}_accumulated.png -tile 2x1 -geometry +0+0 $LABELBOX/$DIR/${i}_montage.png
         if [[ $? -ne 0 ]]; then
-            echo "Montage konnte nicht ausgefuert werden auf Bild: ${i} in $DIR!"
+            echo "Montage cannot be done on image: ${i} in $DIR!"
             exit 1
         fi
     done
-
-    ENDING=$(date +%s.%N)
-    DIFF=$(echo "$END - $START" | bc)
-    echo "Done Directory ... Time: $DIFF"
 done
+
+ENDING=$(date +%s)
+DIFF=$(echo "$ENDING - $START" | bc)
+echo "Done Directory ... Time: $DIFF Sec"
