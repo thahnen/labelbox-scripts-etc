@@ -13,10 +13,10 @@ CLUSTERED=$PLAIN_PATH/../cluster
 ACCUMULATED=$PLAIN_PATH/../accumulated
 LABELBOX=$PLAIN_PATH/../labelbox
     
-    
 ## Test if directories exists!
 if [[ ! -d $PLAIN_PATH ]] || [[ ! -d $CLUSTERED ]] || [[ ! -d $ACCUMULATED ]]; then
     echo "Plain/ Clustered or Accumulated folder does not exist, cannot create Montages!"
+    exit 1
 fi
 
 if [[ ! -d $LABELBOX ]]; then
@@ -64,9 +64,10 @@ for DIR in $PLAIN_PATH/*/; do
 
     ## For all images do montage
     for i in $(eval echo {$START..$END}); do
-        montage $CLUSTERED/$DIR/${i}_clustered.png $ACCUMULATED/$DIR/${i}_accumulated.png -tile 2x1 -geometry +0+0 $LABELBOX/$DIR/${i}_montage.png
+        montage $CLUSTERED/$DIR/${i}_clustered.png $ACCUMULATED/$DIR/${i}_accumulated.png -tile 2x1 -geometry +0+0 $LABELBOX/$DIR/${i}_montage.png &>/dev/null
         if [[ $? -ne 0 ]]; then
             echo "Montage cannot be done on image: ${i} in $DIR!"
+            echo "May 'montage' is not installed?"
             exit 1
         fi
     done

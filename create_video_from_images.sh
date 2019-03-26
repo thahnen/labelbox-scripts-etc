@@ -12,6 +12,7 @@ PLAIN_PATH=/data/DVS/DVS_HGH/plain
 ## Test if Plain folder exists
 if [[ ! -d $PLAIN_PATH ]]; then
     echo "Plain folder does not exist, cannot create Videos!"
+    exit 1
 fi
 
 
@@ -35,7 +36,7 @@ for DIR in $PLAIN_PATH/*/; do
     ffmpeg -r 30 -f image2 -s 720x640 -pattern_type glob -i '*.png' -vcodec libx264 -crf 15 $VIDEO_NAME &>/dev/null
     if [ $? -ne 0 ]; then
         echo "An error with FFMPEG occured!"
-        rm $VIDEO_NAME
+        rm $VIDEO_NAME &>/dev/null      ## Remove it, because it could have occured in the middle!
         exit 1
     fi
 
