@@ -36,3 +36,4 @@ Takes ages on 60 datasets per 1000 images (768x640px). On my machine: ~3-4 hours
 - dauert derzeit rund 3 Stunden!
 3. in **create_montages.sh** ueberpruefen, ob der Plain-Ordner leer ist oder nicht!
 4. generell in Python-Dateien ueberpruefen, ob Ordner "leer"
+5. noch jeweils bei allen Skripten, die Root-Rechte erfordern den Daten wieder die richtigen Rechte zuweisen!

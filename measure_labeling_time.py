@@ -56,7 +56,14 @@ if __name__ == "__main__":
                 print(f"\nDurchschnittliche Zeit fuer ein Dataset: {round(times[0]/60, 2)} min")
                 print(f"Veranschlagte Zeit fuer alle 60 Datasets: {round(times[0]/60, 2)} h")
                 print(f"Bereits bearbeitete {times[1]} Datasets, hat gedauert: {round(times[0]*times[1]/60/60, 2)} h")
-                print(f"Es fehlen noch {60-times[1]} Datasets, das dauert: {round(times[0]*(60-times[1])/60/60, 2)} h \n")
+                print(f"Es fehlen noch {60-times[1]} Datasets, das dauert: {round(times[0]*(60-times[1])/60/60, 2)} h")
+                print("\nNicht mit einbezogen sind die Zeiten zum:" +\
+                        "\n- Vorbereiten der Daten (Kollagen-Erstellung etc)" +\
+                        "\n- Erstellen der Skripte zur Verarbeitung der Labelbox-Exporte" +\
+                        "\n- Vorbereiten des Labeln (Erstellung Labeling-Interface etc)" +\
+                        "\n- Nachbereiten des Labeln (Nachlabeln bei Fehlern etc)" +\
+                        "\n- Verarbeiten der Labelbox-Exporte" +\
+                        "\n=> grob gerechnet also 1 1/2 - 2x der obrigen Werte!\n")
             else:
                 print("Es ist ein Fehler bei der Berechnung aufgetreten!")
                 exit(1)
