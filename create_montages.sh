@@ -71,6 +71,13 @@ for DIR in $PLAIN_PATH/*/; do
             exit 1
         fi
     done
+
+    ## Giving the owning user its rights to the files back
+    FOLDER_OWNER=$(stat -c '%U' $PLAIN_PATH)
+    chown $FOLDER_OWNER $LABELBOX/*
+    if [ $? -ne 0 ]; then
+        echo "Owner of the files cannot be set to the folders owner, have to do it manually!"
+    fi
 done
 
 ENDING=$(date +%s)
