@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+
+## This script is only used on the old data which did not use NNs to get the results!
+
+
 ## For working with /data/ user must be root!
 if [[ "$( id -u )" != "0" ]]; then
 	echo "Be root to use me!" 1>&2
@@ -67,7 +71,7 @@ for DIR in $PLAIN_PATH/*/; do
         montage $CLUSTERED/$DIR/${i}_clustered.png $ACCUMULATED/$DIR/${i}_accumulated.png -tile 2x1 -geometry +0+0 $LABELBOX/$DIR/${i}_montage.png &>/dev/null
         if [[ $? -ne 0 ]]; then
             echo "Montage cannot be done on image: ${i} in $DIR!"
-            echo "May 'montage' is not installed?"
+            echo "Maybe 'montage' is not installed?"
             exit 1
         fi
     done

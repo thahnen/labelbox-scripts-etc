@@ -30,6 +30,14 @@ Takes ages on 60 datasets per 1000 images (768x640px). On my machine: ~3-4 hours
 
 ---
 
+## create_montages_darkflow.sh
+Create montages of the accumulated grayscale images for labeling in Labelbox using the values of the NNs.
+
+### Disclaimer:
+Takes ages on on dataset by ~30.000 images (768x640px). On my machine:
+
+---
+
 ## TODO:
 1. in **change_labelbox_names.py** darauf achten, nicht alle anderen Dateien neben den Bildern umzubennenen!
 2. in **create_montages.sh** ggf alle (60) Montagen parallelisieren, damit es schneller fertig ist!
