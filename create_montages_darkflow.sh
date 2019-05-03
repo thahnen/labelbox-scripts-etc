@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 ## This script is used with the newly approached "Tracking with darkflow" method!
 
 
@@ -49,6 +48,20 @@ for i in $(eval echo {$START..$END}); do
         exit 1
     fi
 done
+
+
+## Split the Folder with its 1000s of images into Subfolders!
+##IMG_PER_FOLDER=1000
+##AMOUNT_IMAGES=$(echo $END | sed 's/^0*//')
+##AMOUNT_FOLDERS=$(($AMOUNT_IMAGES / $IMG_PER_FOLDER))
+##if [[ $(($AMOUNT_IMAGES % $IMG_PER_FOLDER)) != 0 ]]; then
+##    AMOUNT_FOLDERS=$(($AMOUNT_FOLDERS + 1))
+##fi
+##
+##for i in $(eval echo {1..$AMOUNT_FOLDERS}); do
+##    echo "Test"
+##done
+
 
 ## Giving the owning user its rights to the files back
 FOLDER_OWNER=$(stat -c '%U' $OUTPUT_PATH)

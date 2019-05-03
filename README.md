@@ -34,7 +34,17 @@ Takes ages on 60 datasets per 1000 images (768x640px). On my machine: ~3-4 hours
 Create montages of the accumulated grayscale images for labeling in Labelbox using the values of the NNs.
 
 ### Disclaimer:
-Takes ages on on dataset by ~30.000 images (768x640px). On my machine:
+Takes ages on a dataset by ~30.000 images (768x640px). On my machine: ~2-3 hours
+
+---
+
+## parse_darkflow_data.py
+kommt noch
+
+---
+
+## upload_to_labelbox.py
+kommt noch
 
 ---
 
