@@ -39,7 +39,10 @@ Takes ages on a dataset by ~30.000 images (768x640px). On my machine: ~2-3 hours
 ---
 
 ## parse_darkflow_data.py
-kommt noch
+Parses the CSV-Output from the NN to a JSON-File, useful for uploading it to Labelbox.
+
+### Disclaimer
+Takes ages on a CSV-file with ~30.000 lines. On my machine: ~25 min
 
 ---
 

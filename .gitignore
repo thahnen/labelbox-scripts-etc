@@ -105,3 +105,6 @@ venv.bak/
 
 # API-Key für Labelbox
 .api.key
+
+# JSON-Dateien als Output
+*.json

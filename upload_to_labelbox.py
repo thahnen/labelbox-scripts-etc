@@ -8,176 +8,173 @@ import time
 from graphqlclient import GraphQLClient
 
 
+###################################################################################################
+#
+#	Die Funktionen sind aus dem GraphQL-Beispiel von Labelbox selbst!
+#
+###################################################################################################
+
 # TODO: Muss hier wirklich das "setupComplete"-Feld so aussehen?
 def completeSetupOfProject(project_id, dataset_id, labeling_frontend_id):
-    res_str = client.execute("""
-    mutation CompleteSetupOfProject($projectId: ID!, $datasetId: ID!, $labelingFrontendId: ID!) {
-      updateProject(
-        where: {
-          id: $projectId
-        },
-        data: {
-          setupComplete: "2018-11-29T20:46:59.521Z",
-          datasets: {
-            connect: {
-              id: $datasetId
+    res = json.loads(client.execute("""
+        mutation CompleteSetupOfProject($projectId: ID!, $datasetId: ID!, $labelingFrontendId: ID!) {
+            updateProject(
+                where: {
+                    id: $projectId
+                },
+                data: {
+                    setupComplete: "2018-11-29T20:46:59.521Z",
+                    datasets: {
+                        connect: {
+                            id: $datasetId
+                        }
+                    },
+                    labelingFrontend: {
+                        connect: {
+                            id: $labelingFrontendId
+                        }
+                    }
+                }
+            ){
+                id
             }
-          },
-          labelingFrontend: {
-            connect: {
-              id: $labelingFrontendId
-            }
-          }
         }
-      ){
-        id
-      }
-    }
     """, {
         'projectId': project_id,
         'datasetId': dataset_id,
         'labelingFrontendId': labeling_frontend_id
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['updateProject']['id']
 
 
 def configure_interface_for_project(ontology, project_id, interface_id, organization_id):
-    res_str = client.execute("""
-      mutation ConfigureInterfaceFromAPI($projectId: ID!, $customizationOptions: String!, $labelingFrontendId: ID!, $organizationId: ID!) {
-        createLabelingFrontendOptions(data: {
-          customizationOptions: $customizationOptions,
-          project: {
-            connect: {
-              id: $projectId
+    res = json.loads(client.execute("""
+        mutation ConfigureInterfaceFromAPI($projectId: ID!, $customizationOptions: String!, $labelingFrontendId: ID!, $organizationId: ID!) {
+            createLabelingFrontendOptions(data: {
+                customizationOptions: $customizationOptions,
+                project: {
+                    connect: {
+                        id: $projectId
+                    }
+                }
+                labelingFrontend: {
+                    connect: {
+                        id: $labelingFrontendId
+                    }
+                }
+                organization: {
+                    connect: {
+                        id: $organizationId
+                    }
+                }
+            }){
+                id
             }
-          }
-          labelingFrontend: {
-            connect: {
-              id: $labelingFrontendId
-            }
-          }
-          organization: {
-            connect: {
-              id: $organizationId
-            }
-          }
-        }){
-          id
         }
-      }
     """, {
         'projectId': project_id,
         'customizationOptions': json.dumps(ontology),
         'labelingFrontendId': interface_id,
         'organizationId': organization_id,
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['createLabelingFrontendOptions']['id']
 
 
 def create_prediction_model(name, version):
-    res_str = client.execute("""
-      mutation CreatePredictionModelFromAPI($name: String!, $version: Int!) {
-        createPredictionModel(data: {
-          name: $name,
-          version: $version
-        }){
-          id
+    res = json.loads(client.execute("""
+        mutation CreatePredictionModelFromAPI($name: String!, $version: Int!) {
+            createPredictionModel(data: {
+                name: $name,
+                version: $version
+            }){
+                id
+            }
         }
-      }
     """, {
         'name': name,
         'version': version
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['createPredictionModel']['id']
 
 
 def attach_prediction_model_to_project(prediction_model_id, project_id):
-    res_str = client.execute("""
-      mutation AttachPredictionModel($predictionModelId: ID!, $projectId: ID!) {
-        updateProject(where: {
-          id: $projectId
-        }, data: {
-          activePredictionModel: {
-            connect: {
-              id: $predictionModelId
+    res = json.loads(client.execute("""
+        mutation AttachPredictionModel($predictionModelId: ID!, $projectId: ID!) {
+            updateProject(where: {
+                id: $projectId
+            }, data: {
+                activePredictionModel: {
+                    connect: {
+                        id: $predictionModelId
+                    }
+                }
+            }){
+                id
             }
-          }
-        }){
-          id
         }
-      }
     """, {
         'predictionModelId': prediction_model_id,
         'projectId': project_id
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['updateProject']['id']
 
 
 def create_prediction(label, prediction_model_id, project_id, data_row_id):
-    res_str = client.execute("""
-      mutation CreatePredictionFromAPI($label: String!, $predictionModelId: ID!, $projectId: ID!, $dataRowId: ID!) {
-        createPrediction(data: {
-          label: $label,
-          predictionModelId: $predictionModelId,
-          projectId: $projectId,
-          dataRowId: $dataRowId,
-        }){
-          id
+    res = json.loads(client.execute("""
+        mutation CreatePredictionFromAPI($label: String!, $predictionModelId: ID!, $projectId: ID!, $dataRowId: ID!) {
+            createPrediction(data: {
+                label: $label,
+                predictionModelId: $predictionModelId,
+                projectId: $projectId,
+                dataRowId: $dataRowId,
+            }){
+                id
+            }
         }
-      }
     """, {
         'label': label,
         'predictionModelId': prediction_model_id,
         'projectId': project_id,
         'dataRowId': data_row_id
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['createPrediction']['id']
-
-
+    
 
 def create_datarow(row_data, external_id,dataset_id):
-    res_str = client.execute("""
-      mutation CreateDataRowFromAPI($rowData: String!, $externalId: String, $datasetId: ID!) {
-        createDataRow(data: {
-          externalId: $externalId,
-          rowData: $rowData,
-          dataset: {
-            connect: {
-              id: $datasetId
+    res = json.loads(client.execute("""
+        mutation CreateDataRowFromAPI($rowData: String!, $externalId: String, $datasetId: ID!) {
+            createDataRow(data: {
+                externalId: $externalId,
+                rowData: $rowData,
+                dataset: {
+                    connect: {
+                        id: $datasetId
+                    }
+                }
+            }){
+                id
             }
-          }
-        }){
-          id
         }
-      }
     """, {
         'rowData': row_data,
         'externalId': external_id,
         'datasetId': dataset_id
-    })
+    }))
 
-    res = json.loads(res_str)
     return res['data']['createDataRow']['id']
 
 
 
+###################################################################################################
 #
+#	Die Funktionen sind aus dem GraphQL-Beispiel von Labelbox selbst!
 #
-#
-#
-#
-
-
+###################################################################################################
 
 def upload(path):
     # Vlt kann man das hier noch etwas schoener laden!
@@ -188,8 +185,7 @@ def upload(path):
     client = GraphQLClient("https://api.labelbox.com/graphql")
     client.inject_token(key)
     
-    # Die JSON-Datei vorfinden und einlesen
-    # sollte folgende Form haben:
+    # Die JSON-Datei vorfinden und einlesen, sollte folgende Form haben:
     #
     # [
     #   {
@@ -199,10 +195,11 @@ def upload(path):
     #       "prediction_label" : {
     #           object : [
     #               {
+    #                   "label_id" : <Id vom NN vergeben>
     #                   "geometry" : [
     #                       {
     #                           "x" : "<X-Koord.>", "y" : "<Y-Koord.>"
-    #                       }, ... (4 mal aber nur weil Rechteck, aber kp ob mit oder gegen Uhrzeigersinn!)
+    #                       }, ... (4 mal aber nur weil Rechteck, aber im Uhrzeigersinn!)
     #                   ]
     #               }, ...
     #           ]
@@ -220,6 +217,11 @@ def upload(path):
     except Exception as e:
         return 2
 
+
+    # TODO: For testing purposes, just use the first 150 images!
+    data = data[:150]
+
+
     # User Information for the Organization Id!
     user_info = json.loads(client.execute("""
         query GetUserInformation {
@@ -231,7 +233,6 @@ def upload(path):
             }
         }
     """))["data"]["user"]
-
     org_id = user_info["organization"]["id"]
 
     # Get the folder name, usefull for the name of the dataset as well as the project
@@ -333,13 +334,19 @@ def upload(path):
     attach_prediction_model_to_project(prediction_model_id, project_id)
     print(f"Created prediction {prediction_model_id}")
 
+    # Because requests have been made!
+    time.sleep(1)
+
     # Create and upload datarow!
     # But beware not to send more than 300 requests per minute!
+    # So every request has an allowed timeframe of 60/300 = 0.2 sec
+    # => every loop equals two requests -> 0.4 sec max duration for a loop.
     amount_uploads = 0
-    time_allowed = 1/150    # because there are two requests each loop!
+    time_allowed = 0.4
     for elem in data:
-        begin = time.time()
         try:
+            begin = time.time()
+
             data_row_id = create_datarow(row["image_url"], row["external_id"], dataset_id)
             print(f"Created DataRow : {data_row_id})
 
@@ -350,12 +357,13 @@ def upload(path):
             if (duration < time_allowed):
                 time.sleep((time_allowed-duration)*1.05)    # waits to not get over the allowed amount of request
         except Exception as e:
-            # What shall we do with this drunken sailor?
-            pass
+            print(e)
+            print("Handle it by yourself, maybe delete the whole project/ dataset!")
+            return 3
+    
+    print(f"Everything went fine: https://app.labelbox.com/projects/{project_id}/overview !")
     
     
-
-
 if __name__ == "__main__":
     if len(sys.argv == 2):
         path = sys.argv[1]
@@ -370,6 +378,8 @@ if __name__ == "__main__":
                 print("Es wurde im Ordner keine JSON-Datei gefunden!")
             elif status == 2:
                 print("Die JSON-Datei konnte nicht gelesen werden!")
+            elif status == 3:
+                print("An Exception occured uploading!")
             else:
                 print("Datensatz erfolgreich hochgeladen!")
                 exit(0)
