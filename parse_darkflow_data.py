@@ -34,13 +34,13 @@ if __name__ == "__main__":
             
             if found:
                 # Objekt hinten anhaengen an bestehenden Frame!
-                label_id = row[1]
+                label_id = int(row[1])
 
                 # Die Punkte liegen im Uhrzeigersinn vor!
-                p1 = {"x" : row[2], "y" : row[3]}
-                p2 = {"x" : row[2]+row[4], "y" : row[3]}
-                p3 = {"x" : row[2]+row[4], "y" : row[3]+row[5]}
-                p4 = {"x" : row[2], "y" : row[3]+row[5]}
+                p1 = {"x" : int(row[2]), "y" : int(row[3])}
+                p2 = {"x" : int(row[2])+int(row[4]), "y" : int(row[3])}
+                p3 = {"x" : int(row[2])+int(row[4]), "y" : int(row[3])+int(row[5])}
+                p4 = {"x" : int(row[2]), "y" : int(row[3])+int(row[5])}
 
                 obj = {
                     "label_id" : label_id,
@@ -58,13 +58,13 @@ if __name__ == "__main__":
                 image_url = "https://127.0.0.1:8000/%010d_montage.png" % frame_nr
 
                 external_id = image_url.split("/")[-1:][0]
-                label_id = row[1]
+                label_id = int(row[1])
 
                 # Die Punkte liegen im Uhrzeigersinn vor!
-                p1 = {"x" : row[2], "y" : row[3]}
-                p2 = {"x" : row[2]+row[4], "y" : row[3]}
-                p3 = {"x" : row[2]+row[4], "y" : row[3]+row[5]}
-                p4 = {"x" : row[2], "y" : row[3]+row[5]}
+                p1 = {"x" : int(row[2]), "y" : int(row[3])}
+                p2 = {"x" : int(row[2])+int(row[4]), "y" : int(row[3])}
+                p3 = {"x" : int(row[2])+int(row[4]), "y" : int(row[3])+int(row[5])}
+                p4 = {"x" : int(row[2]), "y" : int(row[3])+int(row[5])}
 
                 frame = {
                     "frame_nr" : frame_nr,

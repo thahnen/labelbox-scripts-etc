@@ -15,7 +15,7 @@ from graphqlclient import GraphQLClient
 ###################################################################################################
 
 # TODO: Muss hier wirklich das "setupComplete"-Feld so aussehen?
-def completeSetupOfProject(project_id, dataset_id, labeling_frontend_id):
+def completeSetupOfProject(client, project_id, dataset_id, labeling_frontend_id):
     res = json.loads(client.execute("""
         mutation CompleteSetupOfProject($projectId: ID!, $datasetId: ID!, $labelingFrontendId: ID!) {
             updateProject(
@@ -48,7 +48,7 @@ def completeSetupOfProject(project_id, dataset_id, labeling_frontend_id):
     return res['data']['updateProject']['id']
 
 
-def configure_interface_for_project(ontology, project_id, interface_id, organization_id):
+def configure_interface_for_project(client, ontology, project_id, interface_id, organization_id):
     res = json.loads(client.execute("""
         mutation ConfigureInterfaceFromAPI($projectId: ID!, $customizationOptions: String!, $labelingFrontendId: ID!, $organizationId: ID!) {
             createLabelingFrontendOptions(data: {
@@ -82,7 +82,7 @@ def configure_interface_for_project(ontology, project_id, interface_id, organiza
     return res['data']['createLabelingFrontendOptions']['id']
 
 
-def create_prediction_model(name, version):
+def create_prediction_model(client, name, version):
     res = json.loads(client.execute("""
         mutation CreatePredictionModelFromAPI($name: String!, $version: Int!) {
             createPredictionModel(data: {
@@ -100,7 +100,7 @@ def create_prediction_model(name, version):
     return res['data']['createPredictionModel']['id']
 
 
-def attach_prediction_model_to_project(prediction_model_id, project_id):
+def attach_prediction_model_to_project(client, prediction_model_id, project_id):
     res = json.loads(client.execute("""
         mutation AttachPredictionModel($predictionModelId: ID!, $projectId: ID!) {
             updateProject(where: {
@@ -123,7 +123,7 @@ def attach_prediction_model_to_project(prediction_model_id, project_id):
     return res['data']['updateProject']['id']
 
 
-def create_prediction(label, prediction_model_id, project_id, data_row_id):
+def create_prediction(client, label, prediction_model_id, project_id, data_row_id):
     res = json.loads(client.execute("""
         mutation CreatePredictionFromAPI($label: String!, $predictionModelId: ID!, $projectId: ID!, $dataRowId: ID!) {
             createPrediction(data: {
@@ -145,7 +145,7 @@ def create_prediction(label, prediction_model_id, project_id, data_row_id):
     return res['data']['createPrediction']['id']
     
 
-def create_datarow(row_data, external_id,dataset_id):
+def create_datarow(client, row_data, external_id,dataset_id):
     res = json.loads(client.execute("""
         mutation CreateDataRowFromAPI($rowData: String!, $externalId: String, $datasetId: ID!) {
             createDataRow(data: {
@@ -184,7 +184,7 @@ def upload(path):
     # Connect to the Labelbox-Endpoint
     client = GraphQLClient("https://api.labelbox.com/graphql")
     client.inject_token(key)
-    
+
     # Die JSON-Datei vorfinden und einlesen, sollte folgende Form haben:
     #
     # [
@@ -213,7 +213,7 @@ def upload(path):
     
     data = []
     try:
-        data = json.load(json_path)
+        data = json.load(open(json_path))
     except Exception as e:
         return 2
 
@@ -236,11 +236,12 @@ def upload(path):
     org_id = user_info["organization"]["id"]
 
     # Get the folder name, usefull for the name of the dataset as well as the project
-    project_folder_name = path.split("/")[-2:][0].split("/")[0]
-    folder_name = path.split("/")[-1:].split("/")[0]
+    #project_folder_name = path.split("/")[-2:][0].split("/")[0]
+    #folder_name = path.split("/")[-1:].split("/")[0]
 
     # Based on this names build the project and its datasets name
-    project_dataset_name = f"DVS_F102 {project_folder_name} {folder_name}"
+    #project_dataset_name = f"DVS_F102 {project_folder_name} {folder_name}"
+    project_dataset_name = "DVS_F102 TEST"
 
     # Every Project gets its own Dataset!
     # they use the data from the Darkflow-NNs!
@@ -305,7 +306,7 @@ def upload(path):
                                 "label": "Anderes"
                             }
                         ],
-                        "required": true
+                        "required": True
                     }, {
                         "name": "label_id",
                         "instructions": "Label (id, id+id, id|id)",
@@ -316,22 +317,22 @@ def upload(path):
                                 "label": ""
                             }
                         ],
-                        "required": true
+                        "required": True
                     }
                 ]
             }
         ]
     }
 
-    configure_interface_for_project(labeling_interface, project_id, interface_id, org_id)
+    configure_interface_for_project(client, labeling_interface, project_id, interface_id, org_id)
     print("Interface added to project!")
 
     # Complete Setup of this specific project!
-    completeSetupOfProject(project_id, dataset_id, interface_id)
+    completeSetupOfProject(client, project_id, dataset_id, interface_id)
 
     # Create Prediction
-    prediction_model_id = create_prediction_model("Darkflow", 1)
-    attach_prediction_model_to_project(prediction_model_id, project_id)
+    prediction_model_id = create_prediction_model(client, "Darkflow", 1)
+    attach_prediction_model_to_project(client, prediction_model_id, project_id)
     print(f"Created prediction {prediction_model_id}")
 
     # Because requests have been made!
@@ -347,10 +348,10 @@ def upload(path):
         try:
             begin = time.time()
 
-            data_row_id = create_datarow(row["image_url"], row["external_id"], dataset_id)
-            print(f"Created DataRow : {data_row_id})
+            data_row_id = create_datarow(client, elem["image_url"], elem["external_id"], dataset_id)
+            print(f"Created DataRow : {data_row_id}")
 
-            prediction_id = create_prediction(json.dumps(row["prediction_label"]), prediction_model_id, project_id, data_row_id)
+            prediction_id = create_prediction(client, json.dumps(elem["prediction_label"]), prediction_model_id, project_id, data_row_id)
             print(f"Created Prediction: {prediction_id}")
 
             duration = time.time()-begin
@@ -365,7 +366,7 @@ def upload(path):
     
     
 if __name__ == "__main__":
-    if len(sys.argv == 2):
+    if len(sys.argv) == 2:
         path = sys.argv[1]
         if os.path.exists(path) and os.path.isdir(path):
             try:
